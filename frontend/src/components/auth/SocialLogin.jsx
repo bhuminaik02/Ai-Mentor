@@ -58,7 +58,7 @@ const SocialLogin = () => {
           alt="Google"
           className="w-4 h-4 mr-2.5 object-contain"
         />
-        <span className="text-xl font-bold">Sign in with Google</span>
+        <span className="text-sm">Sign in with Google</span>
       </button>
     </div>
   );

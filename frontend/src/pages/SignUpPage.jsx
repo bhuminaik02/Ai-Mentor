@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Lock, Moon, Sun, Check, X, Mail, User } from "lucide-react";
+import { Eye, EyeOff, Lock, Moon, Sun, Check, X } from "lucide-react";
 import { useTheme } from "../context/ThemeContext";
 import { useAuth } from "../context/AuthContext";
 import AuthLayout from "../components/auth/AuthLayout";
@@ -8,27 +8,20 @@ import SocialLogin from "../components/auth/SocialLogin";
 import toast from "react-hot-toast";
 
 /* FormInput stays UI-only */
-const FormInput = ({ label, type, placeholder, value, onChange,leftElement, rightElement }) => {
+const FormInput = ({ label, type, placeholder, value, onChange }) => {
   return (
     <div className="mb-3">
       <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
         {label}
       </label>
-      <div className="relative group">
-        {leftElement && (
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            {leftElement}
-          </div>
-        )}
       <input
         type={type}
-        className={`${leftElement ? "pl-10" :""} w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00BEA5] focus:border-transparent transition-all dark:bg-[#0f172a] dark:border-gray-700 dark:text-white dark:placeholder-gray-500`}
+        className="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00BEA5] focus:border-transparent transition-all dark:bg-[#0f172a] dark:border-gray-700 dark:text-white dark:placeholder-gray-500"
         placeholder={placeholder}
         value={value}
         onChange={onChange}
         required
-      />  
-    </div>
+      />
     </div>
   );
 };
@@ -153,9 +146,6 @@ const SignUpPage = () => {
           placeholder="Enter your email here"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          leftElement={
-            <Mail className="h-5 w-5 text-gray-400 dark:text-gray-500 group-focus-within:text-teal-500 transition-colors" />
-          }
         />
 
         <FormInput
@@ -164,9 +154,6 @@ const SignUpPage = () => {
           placeholder="Enter your username here"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          leftElement={
-            <User className="h-5 w-5 text-gray-400 dark:text-gray-500 group-focus-within:text-teal-500 transition-colors" />
-          }
         />
 
         {/* Password */}
@@ -174,14 +161,10 @@ const SignUpPage = () => {
           <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
             Create a Password
           </label>
-          <div className="relative group">
-            {/* LEFT ICON */}
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Lock className="h-5 w-5 group-focus-within:text-teal-500 text-gray-400" />
-            </div>
+          <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
-              className="w-full pl-10 px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00BEA5] focus:border-transparent transition-all dark:bg-[#0f172a] dark:border-gray-700 dark:text-white dark:placeholder-gray-500"
+              className="w-full px-3 py-2 rounded-lg bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#00BEA5] focus:border-transparent transition-all dark:bg-[#0f172a] dark:border-gray-700 dark:text-white dark:placeholder-gray-500"
               placeholder="••••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

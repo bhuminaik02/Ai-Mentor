@@ -43,34 +43,3 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
 }
-
-@keyframes floatMedium {
-  0% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-14px) rotate(4deg);
-  }
-  100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-}
-
-.float-medium {
-  animation: floatMedium 6s ease-in-out infinite;
-}
-
-.float-medium-1 {
-  animation: floatMedium 8s ease-in-out infinite;
-  animation-delay: 0.5s;
-}
-
-.float-medium-2 {
-  animation: floatMedium 10s ease-in-out infinite;
-  animation-delay: 1s;
-}
-
-.float-medium-3 {
-  animation: floatMedium 12s ease-in-out infinite;
-  animation-delay: 1.5s;
-}
