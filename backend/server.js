@@ -19,7 +19,7 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 import certificateRoutes from "./routes/certificateRoutes.js";
 import paymentRoutes from "./routes/payment.js";
 import preferenceRoutes from "./routes/preferenceRoutes.js";
-import contactUsRoutes from "./routes/contactus.js"; // ✅ fixed import
+import contactUsRoutes from "./routes/contactus.js";
 
 // ================= MODELS =================
 import "./models/CommunityPost.js";
@@ -28,7 +28,42 @@ import "./models/Report.js";
 import "./models/modelAssociations.js";
 import "./models/contactMessage.js";
 
+// ================= CONFIG =================
 dotenv.config();
+
+/* =========================
+   ENVIRONMENT VARIABLES CHECK
+========================= */
+
+const requiredEnvVars = [
+  "GEMINI_API_KEY",
+  "CLOUDINARY_CLOUD_NAME",
+  "CLOUDINARY_API_KEY",
+  "CLOUDINARY_API_SECRET",
+];
+
+const missingKeys = [];
+
+requiredEnvVars.forEach((key) => {
+  if (!process.env[key]) {
+    console.log(`❌ ${key} is missing`);
+    missingKeys.push(key);
+  }
+});
+
+if (missingKeys.length === 0) {
+  console.log("✅ All environment variables loaded successfully");
+} else {
+  console.log("\n⚠ Missing Environment Variables:");
+  missingKeys.forEach((key) => {
+    console.log(`➡ ${key}`);
+  });
+
+  console.log("\n❌ Server may not work properly.\n");
+}
+
+// ✅ FIX: define environment flag
+const isDevelopment = process.env.NODE_ENV !== "production";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,7 +77,7 @@ app.use(
   cors({
     origin: process.env.FRONTEND_URL || "http://localhost:5173",
     credentials: true,
-  }),
+  })
 );
 
 // ================= STATIC FILES =================
@@ -66,7 +101,7 @@ app.use("/api/community", communityRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/certificate", certificateRoutes);
 app.use("/api/preferences", preferenceRoutes);
-app.use("/api/contactus", contactUsRoutes); // ✅ added route
+app.use("/api/contactus", contactUsRoutes);
 
 // ================= 404 HANDLER =================
 app.use((req, res) => {
@@ -93,12 +128,20 @@ const startServer = async () => {
   try {
     await connectDB();
 
-    await sequelize.sync();
-    console.log("✅ Database models synced");
+    // ✅ Better sync handling
+    const syncOptions = isDevelopment ? { alter: true } : {};
+    await sequelize.sync(syncOptions);
+
+    console.log(
+      isDevelopment
+        ? "✅ Database synced (development - alter enabled)"
+        : "✅ Database synced (production)"
+    );
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
     });
+
   } catch (error) {
     console.error("❌ Server failed:", error);
     process.exit(1);

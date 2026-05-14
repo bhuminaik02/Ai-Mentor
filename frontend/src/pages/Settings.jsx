@@ -239,7 +239,7 @@ export default function Settings() {
       if (!user) return;
       try {
         const token = localStorage.getItem("token");
-        const { data } = await axios.get("${API_BASE_URL}/api/users/settings", { headers: { Authorization: `Bearer ${token}` } });
+        const { data } = await axios.get("api/users/settings", { headers: { Authorization: `Bearer ${token}` } });
         const notifications = data?.notifications
           ? JSON.parse(JSON.stringify(data.notifications))
           : null;
