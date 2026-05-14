@@ -7,6 +7,16 @@ import { getCourseAndLessonTitles } from "../controllers/courseController.js";
 import dotenv from "dotenv";
 dotenv.config();
 
+if (!process.env.AI_SERVICE_URL) {
+  console.error("❌ AI_SERVICE_URL is missing in .env");
+  process.exit(1);
+}
+
+if (!process.env.GEMINI_API_KEY) {
+  console.error("❌ GEMINI_API_KEY is missing in .env");
+  process.exit(1);
+}
+
 const router = express.Router();
 
 router.post("/generate-video", protect, validate(generateVideoSchema), async (req, res) => {
