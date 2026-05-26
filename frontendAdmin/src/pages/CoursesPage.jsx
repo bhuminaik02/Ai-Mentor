@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import { useEffect, useState, useCallback, useRef, useMemo } from "react";
-=======
-import { useEffect, useState, useCallback, useMemo, useRef } from "react";
->>>>>>> 475a2bb90232a55604b5c6b5832dca17e4c95646
 import { Plus, X, ChevronDown, SlidersHorizontal, ArrowUpDown, Check, BookOpen } from "lucide-react";
 import { callApi } from "../utils/api";
 import CourseStatusDropdown from "../components/CourseStatusDropdown";
