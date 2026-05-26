@@ -102,3 +102,23 @@ export const getAllReports = async (req, res) => {
     res.status(500).json({ success: false, message: "Server Error" });
   }
 };
+
+export const getAllDiscussions = async (req, res) => {
+  try {
+    const { type } = req.query; // optional filter: "global" | "course"
+    const where = type ? { type } : {};
+
+    const discussions = await CommunityPost.findAll({
+      where,
+      include: [
+        { model: User, as: "author", attributes: ["id", "name", "email", "avatar_url"] },
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+
+    res.json({ success: true, data: discussions });
+  } catch (error) {
+    console.error("GET ALL DISCUSSIONS ERROR:", error.message);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
