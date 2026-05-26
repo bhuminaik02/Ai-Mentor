@@ -23,6 +23,7 @@ import {
   getAllEnrollments,
   getAllPayments,
   getAllReports,
+  getAllDiscussions,
 } from "../controllers/dataController.js";
 import {
   getAdminNotifications,
@@ -56,6 +57,7 @@ router.get("/users", protectAdmin, getAllUsers);
 router.patch("/users/:id/status", protectAdmin, superAdminOnly, updateUserStatus);
 router.delete("/users/:id", protectAdmin, superAdminOnly, deleteUser);
 router.get("/reports", protectAdmin, getAllReports);
+router.get("/discussions", protectAdmin, getAllDiscussions);
 router.get("/admins", protectAdmin, getAllAdmins);
 
 // Notifications
