@@ -21,7 +21,11 @@ const ReportPage = () => {
     if (!form.email.trim()) return "Email is required.";
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return "Please enter a valid email address.";
     if (!form.phone.trim()) return "Phone number is required.";
-    if (!/^[0-9+\-\s()]{7,15}$/.test(form.phone.trim())) return "Please enter a valid phone number.";
+    if (
+      !/^\+?[0-9\s\-()]{7,15}$/.test(form.phone.trim()) ||
+      (form.phone.trim().match(/\d/g) || []).length < 10
+    )
+      return "Please enter a valid phone number (min. 10 digits).";
     if (!form.description.trim()) return "Please describe your complaint.";
     if (form.description.trim().length < 20) return "Description must be at least 20 characters.";
     return null;
