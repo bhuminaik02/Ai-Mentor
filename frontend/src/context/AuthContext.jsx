@@ -7,9 +7,9 @@ import React, {
   useCallback,
 } from "react";
 import { signOut } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth } from "../firebase.js"; 
+import { apiFetch } from "../lib/api";
 
-import { apiFetch } from '../lib/api';
 const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -37,6 +37,7 @@ export const AuthProvider = ({ children }) => {
       return null;
     }
   });
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     const storedUser = localStorage.getItem("user");
@@ -50,7 +51,6 @@ export const AuthProvider = ({ children }) => {
   const login = (userData) => {
     setIsAuthenticated(true);
 
-    // Normalize user data to ensure all required fields exist
     const newUser = {
       ...userData,
       token: userData.token || localStorage.getItem("token"),
@@ -64,7 +64,6 @@ export const AuthProvider = ({ children }) => {
     setUser(newUser);
     localStorage.setItem("token", newUser.token);
     localStorage.setItem("user", JSON.stringify(newUser));
-    // Clear skip flags on every login to ensure onboarding triggers correctly
     localStorage.removeItem("preferencesSkipped");
   };
 
@@ -73,8 +72,8 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-       const response = await apiFetch('/api/users/profile');
-    if (!response) return;
+      const response = await apiFetch("/api/users/profile");
+      if (!response) return;
       if (response.ok) {
         const userData = await response.json();
 
@@ -101,28 +100,25 @@ export const AuthProvider = ({ children }) => {
       fetchUserProfile();
     }
   }, [isAuthenticated, fetchUserProfile]);
-  
-const logout = async () => {
 
-        try {
-      await signOut(auth);
+  const logout = async () => {
+    try {
+      if (auth) {
+        await signOut(auth);
+      }
     } catch (error) {
       console.error("Firebase sign out error:", error);
     }
 
     setIsAuthenticated(false);
     setUser(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
 
-    // Clear course progress from localStorage
     Object.keys(localStorage).forEach((key) => {
       if (key.startsWith("course-progress-")) {
         localStorage.removeItem(key);
       }
     });
 
-    // Safety: Clear everything to prevent stale data
     localStorage.clear();
   };
 
