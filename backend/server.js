@@ -24,6 +24,7 @@ import preferenceRoutes from "./routes/preferenceRoutes.js";
 import contactUsRoutes from "./routes/contactus.js"; // ✅ fixed import
 import reportRoutes from "./routes/reportRoutes.js";
 import docsRoutes from "./routes/docsRoutes.js";
+import calendarTaskRoutes from "./routes/calendarTaskRoutes.js";
 import helmet from "helmet";
 
 // ================= MODELS =================
@@ -83,6 +84,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/certificate", certificateRoutes);
 app.use("/api/preferences", preferenceRoutes);
 app.use("/api/contactus", contactUsRoutes); // ✅ added route
+app.use("/api/calendar-tasks", calendarTaskRoutes);
 app.use("/api/course-reports", reportRoutes);
 app.use("/api/docs", docsRoutes);
 
