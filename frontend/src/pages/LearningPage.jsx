@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 
 import { useNavigate, useParams } from "react-router-dom";
@@ -1009,7 +1010,7 @@ export default function Learning() {
             </div>
 
             {/* Rate Course Modal Popup */}
-            {showFeedbackPanel && (
+            {showFeedbackPanel && createPortal(
               <div
                 className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
                 onClick={(e) => {
@@ -1033,7 +1034,8 @@ export default function Learning() {
                     />
                   </div>
                 </div>
-              </div>
+              </div>,
+              document.body
             )}
           </div>
         </div>

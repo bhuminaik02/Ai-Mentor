@@ -7,6 +7,7 @@
  * - Clicking the 💬 icon opens a full reviews modal
  */
 import { useState, useEffect, useCallback, useRef } from "react";
+import { createPortal } from "react-dom";
 import { Star, MessageSquare, X, ChevronDown, ChevronUp } from "lucide-react";
 import CourseFeedback from "./CourseFeedback";
 import API_BASE_URL from "../../lib/api";
@@ -77,7 +78,7 @@ function ReviewsModal({ courseId, onClose }) {
     return () => document.removeEventListener("keydown", handler);
   }, [onClose]);
 
-  return (
+  return createPortal(
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
@@ -96,7 +97,8 @@ function ReviewsModal({ courseId, onClose }) {
           <CourseFeedback courseId={courseId} />
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
