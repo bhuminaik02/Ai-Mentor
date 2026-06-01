@@ -235,29 +235,13 @@ router.get("/video/:courseId/:filename", async (req, res) => {
     const pythonVideoUrl =
       `${process.env.AI_SERVICE_URL}/video-stream/${filename}`;
 
-    const response = await fetch(pythonVideoUrl);
-
-    if (!response.ok) {
-      return res.status(404).json({
-        error: "Video not found in AI service",
-      });
-    }
-
-    res.setHeader("Content-Type", "video/mp4");
-    // Streams the response body directly to the client
-    const reader = response.body.getReader();
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      res.write(value);
-    }
-    res.end();
-
+    // Redirect the browser directly to the Python AI service StaticFiles server.
+    // This fully supports HTTP Range Requests (seek, buffering) which the manual proxy broke.
+    res.redirect(pythonVideoUrl);
   } catch (error) {
     console.error("❌ Proxy Error:", error.message);
     res.status(500).json({
-      error: "Failed to load video via proxy",
+      error: "Failed to redirect to video stream",
     });
   }
 });
