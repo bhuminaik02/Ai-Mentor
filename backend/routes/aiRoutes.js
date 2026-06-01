@@ -69,11 +69,7 @@ router.post("/generate-video", protect, validate(generateVideoSchema), async (re
       );
 
       if (!videoCheck.ok) {
-<<<<<<< HEAD
         console.log("⚠️ Cached video missing. Removing from DB...");
-=======
-
->>>>>>> d9510bc5672f26b953cc47b19f3ced7a947a90a6
         await cachedVideo.destroy();  // delete bad cache
       } else {
         console.log("✅ Cached video verified.");
@@ -105,7 +101,6 @@ router.post("/generate-video", protect, validate(generateVideoSchema), async (re
       ? userPreferencesRecord.toJSON()
       : null;
 
-<<<<<<< HEAD
   
     // Send request directly to Python AI service
     const aiServiceResponse = await fetch(`${process.env.AI_SERVICE_URL}/generate`, {
@@ -142,11 +137,6 @@ router.post("/generate-video", protect, validate(generateVideoSchema), async (re
       status: "processing",
       message: "Video generation started",
     });
-=======
-       
-    // Temporary fallback response since videoQueue is disabled
-    return res.status(501).json({ message: "Video generation is temporarily disabled." });
->>>>>>> d9510bc5672f26b953cc47b19f3ced7a947a90a6
 
   } catch (error) {
     console.error("AI GENERATE ERROR:", error);
