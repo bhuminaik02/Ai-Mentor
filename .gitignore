@@ -10,7 +10,7 @@ pnpm-debug.log*
 __pycache__
 
 venv/
-
+outputfolder
 # Videos
 videos/
 
@@ -61,4 +61,8 @@ coverage/
 
 */.agents
 
-outputfolder/
+backend/config/serviceAccountKey.json
+# =====================
+# Local Scripts
+# =====================
+start_ai.bat
