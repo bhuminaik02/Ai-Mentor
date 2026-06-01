@@ -6,6 +6,8 @@ import jwt from "jsonwebtoken";
 import cloudinary from "../config/cloudinary.js";
 import fs from "fs";
 import { ensureProfileCompleteness, formatFullName } from "../utils/userUtils.js";
+import { createNotification } from "./notificationController.js";
+
 
 // Generate JWT Token
 const generateToken = (id) => {
@@ -207,6 +209,12 @@ const purchaseCourse = async (req, res) => {
     user.changed("purchasedCourses", true);
 
     await user.save();
+    await createNotification(user.id, {
+      title: "Course Enrolled 🎉",
+      message: `You successfully enrolled in ${courseTitle || "a course"}`,
+      type: "course",
+      metadata: { courseId },
+    });
 
     res.status(200).json({
       message: "Course enrolled successfully",
@@ -266,12 +274,6 @@ const updateCourseProgress = async (req, res) => {
       user.set("purchasedCourses", courses);
 
       user.changed("purchasedCourses", true);
-      console.log(
-        "Saved lesson data for course:",
-        courseId,
-        "lesson:",
-        lessonData?.lessonId
-      );
     }
 
     user.analytics = user.analytics || {
@@ -297,68 +299,97 @@ const updateCourseProgress = async (req, res) => {
 const getWatchedVideos = async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
     const courses = user.purchasedCourses || [];
-    console.log("getWatchedVideos - courses loaded:", JSON.stringify(courses, null, 2));
 
-    let videoData = [];
-    let totalSeconds = 0;
-    let completedCount = 0;
+    const watchedVideos = [];
     const uniqueCourses = [];
 
+    let totalSeconds = 0;
+    let completedCount = 0;
+
     courses.forEach((course) => {
-      if (course.courseTitle) {
-        uniqueCourses.push({ id: course.courseId, title: course.courseTitle });
-      }
+      const progress = course.progress || {};
+      const lessonData = progress.lessonData || {};
 
-      const lessonData = course.progress?.lessonData || {};
       Object.keys(lessonData).forEach((lessonId) => {
-        const watchHistory = lessonData[lessonId]?.watchHistory;
-        if (watchHistory) {
-          const safeProgress = Math.max(
-            0,
-            Math.min(100, Math.round(watchHistory.progressPercent || 0))
+        const lesson = lessonData[lessonId];
+
+        if (!lesson?.watchHistory) return;
+
+        const watchHistory = lesson.watchHistory;
+
+       const safeProgress = Number(
+           Math.max(
+                    0,
+                     Math.min(100, watchHistory.progressPercent || 0)
+                  ).toFixed(1)
           );
+watchedVideos.push({
+  lessonId,
+  courseId: course.courseId,
+  course: course.courseTitle || "Course",
+  title: watchHistory.title || "Untitled Lesson",
+  thumbnail: watchHistory.thumbnail,
+  progress: Number(safeProgress.toFixed(1)),
+  currentTime: watchHistory.currentTime || 0,
+  duration: watchHistory.duration || 0,
+  formattedDuration:
+    watchHistory.formattedDuration || "0:00",
+  lastWatched: watchHistory.lastWatched,
+  status: watchHistory.status || "in-progress",
+});
 
-          const rawDuration = watchHistory.formattedDuration;
-          const displayDuration =
-            rawDuration === "NaN:NaN" || !rawDuration ? "--:--" : rawDuration;
+       if (!uniqueCourses.includes(course.courseId)) {
+          uniqueCourses.push(course.courseId);
+        }
 
-          videoData.push({
-            id: `${course.courseId}-${lessonId}`,
-            lessonId: lessonId,
-            courseId: course.courseId,
-            course: course.courseTitle || `Course ${course.courseId}`,
-            title: watchHistory.title || `Lesson ${lessonId}`,
-            thumbnail:
-              watchHistory.thumbnail ||
-              "https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1000&auto=format&fit=crop",
-            duration: displayDuration,
-            progress: safeProgress,
-            status: watchHistory.status || "in-progress",
-            lastWatched: watchHistory.lastWatched || new Date().toISOString(),
-            currentTime: watchHistory.currentTime || 0,
-          });
+        if (watchHistory.currentTime > 0) {
+          totalSeconds += watchHistory.currentTime;
+        }
 
-          if (watchHistory.currentTime > 0) {
-            totalSeconds += watchHistory.currentTime;
-          }
-          if (watchHistory.status === "completed" || safeProgress >= 95) {
-            completedCount++;
-          }
+        if (
+             watchHistory.status === "completed" ||
+            safeProgress >= 80
+          ) {
+         completedCount++;
         }
       });
     });
 
+    const uniqueDays = new Set();
+
+    watchedVideos.forEach((video) => {
+      if (video.lastWatched) {
+        const day = new Date(video.lastWatched).toDateString();
+        uniqueDays.add(day);
+      }
+    });
+
+    const avgSeconds =
+      watchedVideos.length > 0
+        ? totalSeconds / watchedVideos.length
+        : 0;
+
+    const avgMinutes = Math.floor(avgSeconds / 60);
+    const avgRemainingSeconds = Math.floor(avgSeconds % 60);
+
     const metrics = {
-      totalHours: (totalSeconds / 3600).toFixed(1),
+      totalHours: (totalSeconds / 60).toFixed(1),
       videosCompleted: completedCount,
-      avgSession: "15min",
-      learningStreak: "3 days",
+      avgSession: `${avgMinutes}m ${avgRemainingSeconds}s`,
+      learningStreak: `${uniqueDays.size} days`,
     };
 
-    res.json({ videos: videoData, metrics, courses: uniqueCourses });
+    res.json({
+      videos: watchedVideos,
+      metrics,
+      courses: [...uniqueCourses],
+    });
   } catch (error) {
     console.error("Failed to fetch watched videos:", error);
     res.status(500).json({ message: "Server error" });
@@ -520,8 +551,8 @@ const deleteAccount = async (req, res) => {
     });
   } catch (error) {
     console.error("Delete Account Error", error);
-    res.status(500).json({message: "Failed to delete account"}); 
-  } 
+    res.status(500).json({ message: "Failed to delete account" });
+  }
 }
 // Complete first-time user profile onboarding
 // Google users: firstName, lastName, password (required), bio, avatar
@@ -596,9 +627,9 @@ const completeProfile = async (req, res) => {
       if (!user.avatar_url) missingFields.push("Profile Photo");
       if (user.googleId && !user.password) missingFields.push("Password");
 
-      return res.status(400).json({ 
+      return res.status(400).json({
         message: `Profile is still incomplete. Missing: ${missingFields.join(", ")}`,
-        missingFields 
+        missingFields
       });
     }
 
