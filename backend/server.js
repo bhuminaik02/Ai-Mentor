@@ -1,4 +1,5 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import cors from "cors";
 import path from "path";
@@ -116,7 +117,7 @@ const startServer = async () => {
     const isDevelopment = process.env.NODE_ENV !== "production";
     const syncOptions = isDevelopment ? { alter: true } : {};
 
-    await sequelize.sync(syncOptions);
+    await sequelize.sync({ FORCE: true });
     console.log(
       isDevelopment
         ? "✅ Database models synced with schema auto-alter enabled (development)"

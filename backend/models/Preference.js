@@ -16,16 +16,18 @@ Preference.init(
       unique: true,
     },
     explanation_type: {
-      type: DataTypes.STRING,
-      allowNull: false,
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: "detailed",
     },
     learning_style: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     teaching_pace: {
-      type: DataTypes.STRING,
-      allowNull: false,
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: "normal",
     },
     example_type: {
       type: DataTypes.STRING,
