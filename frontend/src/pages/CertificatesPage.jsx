@@ -737,9 +737,10 @@ const CertificatesPage = () => {
     {/* Issue Button */}
 <button
   onClick={() => navigate("/report")}
+  aria-label="Report an issue"
   className="fixed bottom-6 right-24 z-50 flex items-center gap-2 px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg transition-all duration-300"
 >
-  <AlertCircle className="w-5 h-5" />
+  <AlertCircle className="w-5 h-5" aria-hidden="true" />
   <span className="hidden md:inline">Issue</span>
 </button>
 
